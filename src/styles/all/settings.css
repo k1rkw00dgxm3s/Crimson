@@ -1,4 +1,4 @@
-/* Settings Page - Glassy Blue Theme */
+/* Settings Page - Crimson Theme */
 
 /* Page Layout */
 #settings-page {
@@ -533,4 +533,68 @@
     .setting-item {
         padding: 0.75rem 1rem;
     }
+}
+
+/* Keep Settings aligned with the red-purple Cr1mson home theme. */
+#settings-page {
+    background: radial-gradient(circle at 50% 0%, rgba(126, 18, 70, .2), transparent 48%), #0b050f;
+}
+
+#settings-header-glow {
+    background: radial-gradient(circle, rgba(220, 40, 112, .18) 0%, transparent 70%);
+}
+
+#settings-title {
+    text-shadow: 0 0 40px rgba(220, 40, 112, .45);
+}
+
+.settings-section::before {
+    background: linear-gradient(135deg, rgba(220, 40, 112, .06) 0%, rgba(113, 32, 154, .03) 100%);
+}
+
+.settings-section:hover {
+    outline-color: rgba(244, 126, 179, .46);
+    box-shadow: 0 12px 40px rgba(169, 40, 104, .16), inset 0 0 0 1px rgba(255, 255, 255, .08);
+}
+
+.section-icon {
+    background: rgba(169, 40, 104, .18);
+    color: #f18ab8;
+    outline-color: rgba(241, 138, 184, .3);
+}
+
+.settings-section:hover .section-icon {
+    background: rgba(169, 40, 104, .3);
+    box-shadow: 0 0 20px rgba(220, 40, 112, .34);
+    outline-color: rgba(241, 138, 184, .55);
+}
+
+.toggle input:checked + .toggle-slider {
+    background: linear-gradient(135deg, rgba(169, 40, 104, .78), rgba(113, 32, 154, .72));
+    outline-color: rgba(241, 138, 184, .6);
+    box-shadow: 0 0 15px rgba(220, 40, 112, .24);
+}
+
+.setting-select:hover,
+.setting-button:hover,
+.setting-input:hover {
+    outline-color: rgba(241, 138, 184, .55);
+}
+
+.setting-select:focus,
+.setting-button:focus,
+.setting-input:focus {
+    outline-color: rgba(220, 40, 112, .7);
+    box-shadow: 0 0 15px rgba(220, 40, 112, .18);
+}
+
+.save-toast {
+    background: rgba(169, 40, 104, .2);
+    border-color: rgba(241, 138, 184, .48);
+    color: #f4a3c6;
+    box-shadow: 0 8px 30px rgba(169, 40, 104, .28);
+}
+
+.save-toast svg {
+    color: #f18ab8;
 }

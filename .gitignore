@@ -17,6 +17,9 @@ pnpm-debug.log*
 .env
 .env.production
 
+# persisted chat account data
+data/chat-users.json
+
 # macOS-specific files
 .DS_Store
 

@@ -1,93 +1,69 @@
-<div align="center">
-      <h1><b>Get ready for Cr1mson</b></h1>
-<img src="https://i.imgur.com/Yl2BdtT.png" style="width: 1200px">
-<img src="https://i.postimg.cc/8c8z0BmC/boltosdemo.png" style="width: 1200px">
-</div>
+# Cr1mson
 
-> [!NOTE]
-> For more links or general support, join
-> our [Discord Server](https://discord.gg/deKc8yB8De).
+Cr1mson is a self-hosted proxy homepage with Scramjet/Ultraviolet browsing, a crimson-themed interface, realtime `#general` chat, and the Lumin Games page.
 
-# Features
-- 2 fast and powerful proxy choices
-- Beautiful OS GUI
-- Powerful site support
-- Flexible cloaking
-- Tons of games (powered by Spark Games!!)
+## Requirements
 
+- Node.js 20 or newer
+- npm or pnpm
 
-<h1>
-  <b>
-    How it Works
-  </b>
-</h1>
-<p>
-  Cr1mson uses <a href="https://github.com/titaniumnetwork-dev/Ultraviolet">Ultraviolet</a>, a proxy backend provided from Titanium Network. Ultraviolet v3 is a fast proxy service, but it's successor, <a href="https://github.com/MercuryWorkshop/scramjet">Scramjet</a>, is in the works. Cr1mson also uses Scramjet, but will default to Ultraviolet because Scramjet is not ready for production yet.
-</p>
-<h1>
-  <b>
-    Why Cr1mson is Better than other Proxies
-  </b>
-</h1>
-<p>
-  If you have used proxy sites such as <a href="https://github.com/UseInterstellar/Interstellar">Interstellar</a> before, you know that they are not very fast or powerful. This is becuase sites like Interstellar use outdated proxy services such as Ultraviolet <b><i>v2</i></b> and <a href="https://github.com/NebulaServices/Dynamic">Dynamic</a>. Ultraviolet v2 is outdated and uses Bare, which is old and not secure. Dynamic is very slow, and does not support many sites.
-</p>
-<h1>
-  <b>
-    Supported Sites
-  </b>
-</h1>
-<p>
-  Some popular sites that Bolt supports are:
+## Install
 
-  - <b>GeForce NOW</b><br>
-  - <b>Now.gg</b><br>
-  - <b>Discord</b><br>
-  - <b>Youtube</b><br>
-  - <b>TikTok</b><br>
-</p>
-<h1>
-  <b>
-    Usage
-  </b>
-</h1>
-<p>
-  To use Cr1mson, you must deploy it. You <b><i>CANNOT</i></b> deploy to services such as:
-  
-  - <b>Vercel</b><br>
-  - <b>Netlify</b><br>
-  - <b>Github Pages</b><br>
-  - <b>Cloudflare Pages</b><br>
+```bash
+npm install
+```
 
-  because they either do not support Wisp, service workers, or are static.<br>
+Or:
 
-  You CAN deploy to:<br><br> <b>
-  - Render<br>
-  - Codeanywhere<br>
-  - Gitpod<br>
-  - Koyeb<br>
-  - CodeSandbox<br>
-  - Github Codespaces<br>
-  - Railway<br></b>
-</p>
-<h1>
-  <b>
-    Local Usage
-  </b>
-</h1>
-<p>
-  This is a Node JS application with npm packages. You must first run:
-  
-  ```bash
-  pnpm i
-  ```pnpm i
-  
-  then run
+```bash
+pnpm install
+```
 
+## Build
 
-  ```bash
-  pnpm start
-  ```pnpm start
-  
-  You should have Cr1mson running locally on <b>localhost:8080</b>!
-</p>
+Generate the static Astro pages before starting the production server:
+
+```bash
+npm run build
+```
+
+## Run
+
+Start on the default port, `8080`:
+
+```bash
+npm start
+```
+
+Open `http://localhost:8080`.
+
+To use another port, set `PORT` before the command:
+
+```bash
+PORT=8081 npm start
+```
+
+Then open `http://localhost:8081`.
+
+The development server runs Astro on port `3000`:
+
+```bash
+npm run dev
+```
+
+## Chat
+
+Open `/chat` or select Chat from the homepage. Create an account with Sign up, then sign in with the same username and password. Accounts are stored in `data/chat-users.json` as salted `scrypt` password hashes. Chat uses a single realtime WebSocket room named `#general`.
+
+## Proxy runtime
+
+The server must run as a Node process because the proxy uses service workers, Wisp, BareMux, and WebSocket transport. Static-only hosts are not supported.
+
+## Useful commands
+
+```bash
+npm run build   # build Astro output
+npm start       # serve dist on PORT or 8080
+npm run dev     # Astro development server on 3000
+npm run astro   # run the Astro CLI
+```

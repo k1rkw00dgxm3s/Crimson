@@ -4,7 +4,10 @@ import { libcurlPath } from "@mercuryworkshop/libcurl-transport";
 import { baremuxPath } from "@mercuryworkshop/bare-mux/node";
 import { join } from "node:path";
 import { hostname } from "node:os";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { server as wisp } from "@mercuryworkshop/wisp-js/server";
+import { WebSocketServer } from "ws";
 
 
 
@@ -12,20 +15,132 @@ try { process.loadEnvFile(); } catch { /* .env not present or Node is too old */
 
 const __dirname = process.cwd();
 const publicPath = join(__dirname, "dist");
+const dataPath = join(__dirname, "data");
+const usersPath = join(dataPath, "chat-users.json");
 
 const fastify = Fastify({
     logger: true,
 });
 
-const chatMessages = [];
-const chatClients = new Set();
+if (!existsSync(dataPath)) mkdirSync(dataPath, { recursive: true });
+const storedUsers = existsSync(usersPath) ? JSON.parse(readFileSync(usersPath, "utf8")) : {};
+const chatUsers = new Map(Object.entries(storedUsers));
 
-function broadcastChatMessage(message) {
-    const payload = `data: ${JSON.stringify(message)}\n\n`;
-    for (const client of chatClients) {
-        if (!client.destroyed) client.write(payload);
-    }
+function hashPassword(password, salt = randomBytes(16).toString("hex")) {
+    return { salt, hash: scryptSync(password, salt, 64).toString("hex") };
 }
+
+function verifyPassword(password, record) {
+    const expected = Buffer.from(record.hash, "hex");
+    const actual = scryptSync(password, record.salt, 64);
+    return expected.length === actual.length && timingSafeEqual(expected, actual);
+}
+
+function saveUsers() {
+    writeFileSync(usersPath, JSON.stringify(Object.fromEntries(chatUsers), null, 2));
+}
+const chatRooms = new Map([
+    ["general", { name: "#general", private: false, owner: null, members: new Set(), messages: [] }],
+]);
+const chatSockets = new Map();
+const chatWss = new WebSocketServer({ noServer: true });
+
+function sendChat(socket, payload) {
+    if (socket.readyState === 1) socket.send(JSON.stringify(payload));
+}
+
+function broadcastRoom(roomId, payload) {
+    const room = chatRooms.get(roomId);
+    if (!room) return;
+    for (const socket of room.members) sendChat(socket, payload);
+}
+
+function publicRooms() {
+    return [...chatRooms.entries()].map(([id, room]) => ({
+        id,
+        name: room.name,
+        private: room.private,
+        members: room.members.size,
+    }));
+}
+
+function roomSnapshot(roomId) {
+    const room = chatRooms.get(roomId);
+    return room ? room.messages.slice(-100) : [];
+}
+
+function leaveRoom(socket, roomId) {
+    const room = chatRooms.get(roomId);
+    if (!room) return;
+    room.members.delete(socket);
+    broadcastRoom(roomId, { type: "rooms", rooms: publicRooms() });
+}
+
+function broadcastRooms() {
+    for (const socket of chatSockets.keys()) sendChat(socket, { type: "rooms", rooms: publicRooms() });
+}
+
+chatWss.on("connection", (socket) => {
+    chatSockets.set(socket, { username: null, roomId: null });
+
+    socket.on("message", (raw) => {
+        let event;
+        try { event = JSON.parse(raw.toString()); } catch { return sendChat(socket, { type: "error", message: "Invalid message." }); }
+        const session = chatSockets.get(socket);
+        if (!session) return;
+
+        if (event.type === "auth") {
+            const username = typeof event.username === "string" ? event.username.trim().slice(0, 32) : "";
+            const password = typeof event.password === "string" ? event.password : "";
+            if (!/^[a-zA-Z0-9_-]{3,32}$/.test(username) || password.length < 4) {
+                return sendChat(socket, { type: "error", message: "Use a 3-32 character username and a 4+ character password." });
+            }
+            const existing = chatUsers.get(username);
+            if (event.mode === "signup") {
+                if (existing) return sendChat(socket, { type: "error", message: "That username is already registered." });
+                chatUsers.set(username, hashPassword(password));
+                saveUsers();
+            } else if (!existing || !verifyPassword(password, existing)) {
+                return sendChat(socket, { type: "error", message: "Incorrect username or password." });
+            }
+            session.username = username;
+            sendChat(socket, { type: "authenticated", username, rooms: publicRooms() });
+            return;
+        }
+
+        if (!session.username) return sendChat(socket, { type: "error", message: "Sign in first." });
+
+        if (event.type === "join-room") {
+            const roomId = typeof event.roomId === "string" ? event.roomId : "";
+            const room = chatRooms.get(roomId);
+            if (!room || roomId !== "general") return sendChat(socket, { type: "error", message: "Only #general is available." });
+            if (session.roomId) leaveRoom(socket, session.roomId);
+            room.members.add(socket);
+            session.roomId = roomId;
+            sendChat(socket, { type: "joined", roomId, messages: roomSnapshot(roomId) });
+            broadcastRooms();
+            return;
+        }
+
+        if (event.type === "message") {
+            const room = chatRooms.get(session.roomId);
+            const text = typeof event.text === "string" ? event.text.trim().slice(0, 500) : "";
+            if (!room || !text) return;
+            const message = { id: crypto.randomUUID(), username: session.username, text, sentAt: new Date().toISOString() };
+            room.messages.push(message);
+            if (room.messages.length > 100) room.messages.shift();
+            broadcastRoom(session.roomId, { type: "message", message });
+            return;
+        }
+
+    });
+
+    socket.on("close", () => {
+        const session = chatSockets.get(socket);
+        if (session?.roomId) leaveRoom(socket, session.roomId);
+        chatSockets.delete(socket);
+    });
+});
 
 fastify.addHook("onSend", async (request, reply, payload) => {
     reply.header("Cross-Origin-Opener-Policy", "same-origin");
@@ -33,7 +148,11 @@ fastify.addHook("onSend", async (request, reply, payload) => {
     return payload;
 });
 fastify.server.on("upgrade", (req, socket, head) => {
-    wisp.routeRequest(req, socket, head);
+    if (req.url === "/chat-ws") {
+        chatWss.handleUpgrade(req, socket, head, (client) => chatWss.emit("connection", client, req));
+    } else {
+        wisp.routeRequest(req, socket, head);
+    }
 });
 
 
@@ -68,42 +187,6 @@ await fastify.register(fastifyStatic, {
 fastify.get("/", (request, reply) => {
     return reply.sendFile("index.html");
 });
-
-fastify.get("/api/chatroom/messages", async (request, reply) => {
-    reply.hijack();
-    const response = reply.raw;
-    response.writeHead(200, {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache, no-transform",
-        "Connection": "keep-alive",
-        "X-Accel-Buffering": "no",
-    });
-    response.write(`event: history\ndata: ${JSON.stringify(chatMessages)}\n\n`);
-    chatClients.add(response);
-    response.on("close", () => chatClients.delete(response));
-});
-
-fastify.post("/api/chatroom/messages", async (request, reply) => {
-    const body = request.body ?? {};
-    const name = typeof body.name === "string" ? body.name.trim().slice(0, 32) : "";
-    const text = typeof body.text === "string" ? body.text.trim().slice(0, 500) : "";
-
-    if (!name || !text) {
-        return reply.status(400).send({ error: "Name and message are required." });
-    }
-
-    const message = {
-        id: crypto.randomUUID(),
-        name,
-        text,
-        sentAt: new Date().toISOString(),
-    };
-    chatMessages.push(message);
-    if (chatMessages.length > 100) chatMessages.shift();
-    broadcastChatMessage(message);
-    return reply.status(201).send(message);
-});
-
 
 fastify.post("/api/chat", async (request, reply) => {
     const apiKey = process.env.OPENROUTER_API_KEY;
@@ -149,8 +232,8 @@ fastify.setNotFoundHandler((request, reply) => {
 
 
 function shutdown() {
-    for (const client of chatClients) client.end();
-    chatClients.clear();
+    for (const client of chatSockets.keys()) client.close();
+    chatSockets.clear();
     console.log("SIGTERM signal received: closing HTTP server");
     fastify.close();
     process.exit(0);

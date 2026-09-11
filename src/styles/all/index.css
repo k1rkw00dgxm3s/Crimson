@@ -229,6 +229,32 @@ body:has(#content) *::-webkit-scrollbar {
     filter: brightness(0) invert(1);
 }
 
+#github-link {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    display: grid;
+    place-items: center;
+    width: 2.9rem;
+    height: 2.9rem;
+    color: #fff;
+    opacity: .72;
+    transition: opacity 180ms ease, transform 180ms ease, filter 180ms ease;
+}
+
+#github-link:hover,
+#github-link:focus-visible {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.08);
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, .7));
+}
+
+#github-link img {
+    width: 1.85rem;
+    height: 1.85rem;
+    filter: brightness(0) invert(1);
+}
+
 .proxy-shortcut svg {
     width: 1.9rem;
     height: 1.9rem;

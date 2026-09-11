@@ -3,53 +3,42 @@ import Layout from "../Layouts/Layout.astro";
 ---
 
 <Layout title="Chat">
-    <main id="chatroom-page">
-        <section id="chatroom-panel">
-            <header id="chatroom-header">
-                <div>
-                    <p class="eyebrow">Cr1mson room</p>
-                    <h1>Chat</h1>
-                    <p id="chat-status">Connecting...</p>
-                </div>
-                <div id="online-indicator" aria-hidden="true"></div>
-            </header>
-
-            <div id="chat-messages" aria-live="polite" aria-label="Chat messages"></div>
-
-            <form id="chat-form">
-                <label class="sr-only" for="chat-name">Your name</label>
-                <input id="chat-name" name="name" maxlength="32" placeholder="Name" autocomplete="nickname" required />
-                <label class="sr-only" for="chat-text">Message</label>
-                <input id="chat-text" name="text" maxlength="500" placeholder="Write a message..." autocomplete="off" required />
-                <button type="submit" aria-label="Send message" title="Send message">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 4 16 8-16 8 3-8-3-8Zm3 8h13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                </button>
+    <main id="chat-page">
+        <section id="auth-panel" class="chat-panel">
+            <p class="eyebrow">Cr1mson realtime</p>
+            <h1>Chat room</h1>
+            <p class="muted">Sign in to join the live #general room.</p>
+            <form id="auth-form">
+                <input id="auth-username" minlength="3" maxlength="32" placeholder="Username" autocomplete="username" required />
+                <input id="auth-password" minlength="4" type="password" placeholder="Password" autocomplete="current-password" required />
+                <button type="submit">Sign in</button>
             </form>
+            <button id="auth-mode" class="text-button" type="button">Need an account? Sign up</button>
+            <p id="auth-status" class="status"></p>
+        </section>
+
+        <section id="room-app" class="chat-panel hidden">
+            <header class="chat-header">
+                <div><p class="eyebrow">Signed in as <span id="current-user"></span></p><h1>#general</h1></div>
+                <button id="sign-out" class="ghost-button">Sign out</button>
+            </header>
+            <section id="room-main">
+                <div id="room-messages" aria-live="polite"></div>
+                <form id="message-form"><input id="message-input" maxlength="500" placeholder="Write in #general..." autocomplete="off" required /><button aria-label="Send message" title="Send message"><svg viewBox="0 0 24 24"><path d="m4 4 16 8-16 8 3-8-3-8Zm3 8h13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></button></form>
+            </section>
+            <p id="room-status" class="status"></p>
         </section>
     </main>
     <script src="../scripts/chatroom.ts"></script>
 </Layout>
 
 <style>
-    #chatroom-page { min-height: 100vh; display: grid; place-items: center; padding: 2rem; color: #fff; background: linear-gradient(135deg, rgba(31, 4, 30, .96), rgba(67, 7, 38, .92)); }
-    #chatroom-panel { width: min(100%, 860px); height: min(82vh, 720px); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; border: 1px solid rgba(255,255,255,.18); border-radius: 18px; background: rgba(18, 5, 22, .78); box-shadow: 0 24px 70px rgba(0,0,0,.38); backdrop-filter: blur(18px); }
-    #chatroom-header { display: flex; align-items: center; justify-content: space-between; padding: 1.35rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,.1); }
-    .eyebrow { margin: 0 0 .25rem; color: #f38ab7; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; }
-    #chatroom-header h1 { margin: 0; font-family: bold; font-size: 2rem; }
-    #chat-status { margin: .35rem 0 0; color: rgba(255,255,255,.58); font-size: .85rem; }
-    #online-indicator { width: .7rem; height: .7rem; border-radius: 50%; background: #e4a2c1; box-shadow: 0 0 14px #e4a2c1; }
-    #online-indicator.connected { background: #77e0ad; box-shadow: 0 0 14px #77e0ad; }
-    #chat-messages { display: flex; flex-direction: column; gap: .8rem; overflow-y: auto; padding: 1.25rem; }
-    .chat-message { max-width: min(78%, 560px); padding: .7rem .9rem; border: 1px solid rgba(255,255,255,.1); border-radius: 12px 12px 12px 3px; background: rgba(255,255,255,.07); }
-    .chat-message strong { display: block; margin-bottom: .2rem; color: #f4a3c6; font-size: .82rem; }
-    .chat-message p { margin: 0; overflow-wrap: anywhere; color: rgba(255,255,255,.9); }
-    .chat-message time { display: block; margin-top: .35rem; color: rgba(255,255,255,.4); font-size: .7rem; }
-    #chat-form { display: grid; grid-template-columns: 8rem 1fr 3rem; gap: .65rem; padding: 1rem; border-top: 1px solid rgba(255,255,255,.1); }
-    #chat-form input { min-width: 0; border: 1px solid rgba(255,255,255,.16); border-radius: 9px; outline: none; padding: .75rem .85rem; color: #fff; background: rgba(255,255,255,.08); font: inherit; }
-    #chat-form input:focus { border-color: #f38ab7; box-shadow: 0 0 0 2px rgba(243,138,183,.18); }
-    #chat-form button { display: grid; place-items: center; border: 0; border-radius: 9px; color: #fff; background: #a92868; cursor: pointer; }
-    #chat-form button:hover { background: #ce3e80; }
-    #chat-form svg { width: 1.2rem; height: 1.2rem; }
-    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
-    @media (max-width: 600px) { #chatroom-page { padding: .75rem; } #chatroom-panel { height: 88vh; } #chat-form { grid-template-columns: 1fr 3rem; } #chat-name { grid-column: 1 / -1; } }
+    #chat-page { min-height: 100vh; display: grid; place-items: center; padding: 1rem; color: #fff; background: linear-gradient(135deg, #160519, #4a092f); }
+    .chat-panel { width: min(900px, 100%); border: 1px solid rgba(255,255,255,.16); border-radius: 18px; background: rgba(17,4,22,.84); box-shadow: 0 24px 70px rgba(0,0,0,.4); backdrop-filter: blur(18px); }
+    #auth-panel { max-width: 460px; padding: 2rem; } h1 { margin: 0 0 .6rem; font-family: bold; } .eyebrow { margin: 0 0 .4rem; color: #f18ab8; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; } .muted, .status { color: rgba(255,255,255,.58); } .status { min-height: 1.2rem; margin: .7rem 0 0; padding: 0 1rem .8rem; font-size: .85rem; }
+    form { display: grid; gap: .7rem; } input { min-width: 0; border: 1px solid rgba(255,255,255,.16); border-radius: 9px; padding: .75rem .85rem; color: #fff; background: rgba(255,255,255,.08); font: inherit; outline: none; } input:focus { border-color: #f18ab8; } button { border: 0; border-radius: 9px; padding: .75rem 1rem; color: #fff; background: #a92868; font: inherit; cursor: pointer; } button:hover { background: #d23b82; } .ghost-button { background: transparent; border: 1px solid rgba(255,255,255,.18); }
+    .text-button { margin-top: .8rem; padding: 0; color: #f18ab8; background: transparent; font-size: .85rem; } .text-button:hover { background: transparent; text-decoration: underline; } .hidden { display: none !important; }
+    .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.4rem; border-bottom: 1px solid rgba(255,255,255,.1); } .chat-header h1 { margin: 0; }
+    #room-main { display: grid; grid-template-rows: 1fr auto; min-height: 62vh; min-width: 0; } #room-messages { display: flex; flex-direction: column; gap: .7rem; overflow-y: auto; padding: 1.2rem; } .message { max-width: 78%; padding: .65rem .8rem; border-radius: 10px 10px 10px 2px; background: rgba(255,255,255,.07); } .message strong { display: block; color: #f18ab8; font-size: .8rem; } .message p { margin: .2rem 0 0; overflow-wrap: anywhere; } #message-form { display: grid; grid-template-columns: 1fr 3rem; padding: 1rem; border-top: 1px solid rgba(255,255,255,.1); } #message-form button { display: grid; place-items: center; padding: .5rem; } #message-form svg { width: 1.2rem; height: 1.2rem; }
+    @media (max-width: 600px) { #chat-page { padding: .75rem; } #room-main { min-height: 72vh; } }
 </style>

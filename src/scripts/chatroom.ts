@@ -1,70 +1,86 @@
-const messagesElement = document.getElementById("chat-messages") as HTMLDivElement;
-const form = document.getElementById("chat-form") as HTMLFormElement;
-const nameInput = document.getElementById("chat-name") as HTMLInputElement;
-const textInput = document.getElementById("chat-text") as HTMLInputElement;
-const statusElement = document.getElementById("chat-status") as HTMLParagraphElement;
-const indicator = document.getElementById("online-indicator") as HTMLDivElement;
+type Message = { id: string; username?: string; text: string; sentAt: string };
 
-const savedName = localStorage.getItem("cr1mson-chat-name");
-if (savedName) nameInput.value = savedName;
+const authPanel = document.getElementById("auth-panel") as HTMLElement;
+const roomApp = document.getElementById("room-app") as HTMLElement;
+const authForm = document.getElementById("auth-form") as HTMLFormElement;
+const authStatus = document.getElementById("auth-status") as HTMLElement;
+const authModeButton = document.getElementById("auth-mode") as HTMLButtonElement;
+const roomStatus = document.getElementById("room-status") as HTMLElement;
+const messages = document.getElementById("room-messages") as HTMLElement;
+const messageForm = document.getElementById("message-form") as HTMLFormElement;
+const messageInput = document.getElementById("message-input") as HTMLInputElement;
+const currentUser = document.getElementById("current-user") as HTMLElement;
+const socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/chat-ws`);
+let authMode: "signin" | "signup" = "signin";
+const pendingMessages: string[] = [];
 
-function renderMessage(message: { name: string; text: string; sentAt: string }): void {
-    const element = document.createElement("article");
-    element.className = "chat-message";
-
-    const name = document.createElement("strong");
-    name.textContent = message.name;
-    const text = document.createElement("p");
-    text.textContent = message.text;
-    const time = document.createElement("time");
-    time.dateTime = message.sentAt;
-    time.textContent = new Date(message.sentAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-
-    element.append(name, text, time);
-    messagesElement.appendChild(element);
-    messagesElement.scrollTop = messagesElement.scrollHeight;
+function send(payload: object): void {
+    const message = JSON.stringify(payload);
+    if (socket.readyState === WebSocket.OPEN) socket.send(message);
+    else if (socket.readyState === WebSocket.CONNECTING) pendingMessages.push(message);
 }
 
-const events = new EventSource("/api/chatroom/messages");
-events.addEventListener("open", () => {
-    statusElement.textContent = "Live room";
-    indicator.classList.add("connected");
-});
-events.addEventListener("history", (event) => {
-    const history = JSON.parse((event as MessageEvent).data) as Array<{ name: string; text: string; sentAt: string }>;
-    messagesElement.replaceChildren();
-    history.forEach(renderMessage);
-});
-events.addEventListener("message", (event) => {
-    renderMessage(JSON.parse((event as MessageEvent).data));
-});
-events.addEventListener("error", () => {
-    statusElement.textContent = "Reconnecting...";
-    indicator.classList.remove("connected");
-});
+function renderMessage(message: Message): void {
+    const element = document.createElement("article");
+    element.className = "message";
+    const author = document.createElement("strong");
+    author.textContent = message.username || "Unknown";
+    const text = document.createElement("p");
+    text.textContent = message.text;
+    element.append(author, text);
+    messages.appendChild(element);
+    messages.scrollTop = messages.scrollHeight;
+}
 
-form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const name = nameInput.value.trim();
-    const text = textInput.value.trim();
-    if (!name || !text) return;
-
-    nameInput.value = name;
-    localStorage.setItem("cr1mson-chat-name", name);
-    textInput.disabled = true;
-
-    try {
-        const response = await fetch("/api/chatroom/messages", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, text }),
-        });
-        if (!response.ok) throw new Error("Message could not be sent");
-        textInput.value = "";
-    } catch {
-        statusElement.textContent = "Unable to send. Try again.";
-    } finally {
-        textInput.disabled = false;
-        textInput.focus();
+socket.addEventListener("open", () => {
+    authStatus.textContent = "Connected. Sign in to continue.";
+    pendingMessages.splice(0).forEach((message) => socket.send(message));
+});
+socket.addEventListener("error", () => { authStatus.textContent = "Chat connection failed. Check that the server is running."; });
+socket.addEventListener("close", () => { roomStatus.textContent = "Connection closed. Refresh to reconnect."; });
+socket.addEventListener("message", (event) => {
+    const payload = JSON.parse(event.data);
+    if (payload.type === "error") {
+        (authPanel.classList.contains("hidden") ? roomStatus : authStatus).textContent = payload.message;
+        return;
     }
+    if (payload.type === "authenticated") {
+        currentUser.textContent = payload.username;
+        authPanel.classList.add("hidden");
+        roomApp.classList.remove("hidden");
+        send({ type: "join-room", roomId: "general" });
+    }
+    if (payload.type === "joined") {
+        messages.replaceChildren();
+        payload.messages.forEach(renderMessage);
+    }
+    if (payload.type === "message") renderMessage(payload.message);
 });
+
+authForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    send({
+        type: "auth",
+        mode: authMode,
+        username: (document.getElementById("auth-username") as HTMLInputElement).value,
+        password: (document.getElementById("auth-password") as HTMLInputElement).value,
+    });
+});
+
+authModeButton.addEventListener("click", () => {
+    authMode = authMode === "signin" ? "signup" : "signin";
+    const submitButton = authForm.querySelector("button") as HTMLButtonElement;
+    submitButton.textContent = authMode === "signup" ? "Sign up" : "Sign in";
+    authModeButton.textContent = authMode === "signup" ? "Already have an account? Sign in" : "Need an account? Sign up";
+    authStatus.textContent = "";
+});
+
+messageForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const text = messageInput.value.trim();
+    if (!text) return;
+    send({ type: "message", text });
+    messageInput.value = "";
+});
+
+document.getElementById("sign-out")?.addEventListener("click", () => location.reload());

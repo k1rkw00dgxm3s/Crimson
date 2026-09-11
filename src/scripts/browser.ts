@@ -587,12 +587,12 @@ const myBrowser = new TabManager('tabs-section', 'web-section');
 // 2. Hook up the "New Tab" button
 const newTabBtn = document.getElementById('new-tab-button');
 newTabBtn?.addEventListener('click', () => {
-    myBrowser.addTab('Loading...', 'cr1mson://newtab');
+    myBrowser.addTab('Loading...', 'crimson://newtab');
 });
 
 // 3. Add a starting tab
 swReady.then(() => {
-    const initialDestination = url ? (url.startsWith('bolt://') ? url : dummyProxy.encodeUrl(url)) : ('cr1mson://newtab');
+    const initialDestination = url ? (url.startsWith('crimson://') ? url : dummyProxy.encodeUrl(url)) : ('crimson://newtab');
     myBrowser.addTab('Loading...', initialDestination);
 });
 
@@ -615,7 +615,7 @@ function navigateTo(url: string) {
 }
 
 function openNewTab() {
-    myBrowser.addTab('Loading...', 'cr1mson://newtab');
+    myBrowser.addTab('Loading...', 'crimson://newtab');
 }
 export { navigateTo, openNewTab };
 
