@@ -2,7 +2,7 @@
 // Handles loading, saving, and interactive behavior for all settings
 import { notify } from "./notifications";
 
-interface BoltSettings {
+interface Cr1msonSettings {
     // Performance
     ultraPerformance: boolean;
     backgroundDetailLevel: string;
@@ -30,7 +30,7 @@ interface BoltSettings {
 
 const STORAGE_KEY = 'bolt-settings';
 
-const defaults: BoltSettings = {
+const defaults: Cr1msonSettings = {
     ultraPerformance: true,
     backgroundDetailLevel: 'eco',
     proxyEngine: 'scramjet',
@@ -51,7 +51,7 @@ const defaults: BoltSettings = {
     showAppsOnLaunch: true,
 };
 
-function loadSettings(): BoltSettings {
+function loadSettings(): Cr1msonSettings {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
@@ -63,7 +63,7 @@ function loadSettings(): BoltSettings {
     return { ...defaults };
 }
 
-function saveSettings(settings: BoltSettings): void {
+function saveSettings(settings: Cr1msonSettings): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
     showToast();
 }
@@ -146,7 +146,7 @@ function init(): void {
     updateCloakVisibility();
 
     // --- Auto-save on change ---
-    function collect(): BoltSettings {
+    function collect(): Cr1msonSettings {
         return {
             ultraPerformance: ultraPerformance?.checked ?? defaults.ultraPerformance,
             backgroundDetailLevel: backgroundDetailLevel?.value ?? defaults.backgroundDetailLevel,
@@ -234,17 +234,17 @@ openBlank?.addEventListener('click', () => {
 });
 
 deepClean?.addEventListener('click', () => {
-    let confirmClear = confirm('Are you sure you want to deep clean and reset Bolt? This will reset all settings and data, and update Bolt to the latest version.');
+    let confirmClear = confirm('Are you sure you want to deep clean and reset Cr1mson? This will reset all settings and data, and update Cr1mson to the latest version.');
     if (confirmClear) {
         deepReset();
     }
 });
 
 export async function deepReset(): Promise<void> {
-    console.log("Resetting Bolt...");
+    console.log("Resetting Cr1mson...");
     window.top!.notify({
-        title: "Resetting Bolt...",
-        desc: "Please wait while we reset Bolt.",
+        title: "Resetting Cr1mson...",
+        desc: "Please wait while we reset Cr1mson.",
         img: "/img/icons/settings.webp",
         lifespan: 3,
         important: false,
@@ -259,7 +259,7 @@ export async function deepReset(): Promise<void> {
 
         window.top!.notify({
             title: "Successfully Reset",
-            desc: "Bolt has been reset. Reloading...",
+            desc: "Cr1mson has been reset. Reloading...",
             img: "/img/icons/settings.webp",
             lifespan: 6,
             important: false,

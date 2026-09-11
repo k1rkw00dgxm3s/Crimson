@@ -1,10 +1,8 @@
 ---
-import BlobBackground from "./blobBackground.astro";
 import AmbientBackground from "./ambientBackground.astro";
 ---
 
 <div id="background-wrapper">
-    <div id="blob-background"><BlobBackground /></div>
     <div id="ultra-background-wrapper"><AmbientBackground /></div>
 </div>
 
@@ -32,23 +30,15 @@ import AmbientBackground from "./ambientBackground.astro";
         }
     });
 
-    if (!localStorage.getItem("bolt-settings")) {
-        document.body.classList.add("ultra-performance");
-    }
+    document.body.classList.remove("ultra-performance");
 </script>
 
 <style>
     :global(.ultra-performance) {
         background-color: #000000 !important;
     }
-    :global(.ultra-performance) #blob-background {
-        display: none !important;
-    }
     #ultra-background-wrapper {
-        display: none;
-    }
-    :global(.ultra-performance) #ultra-background-wrapper {
-        display: block !important;
+        display: block;
         position: fixed;
         inset: 0;
         z-index: -1;

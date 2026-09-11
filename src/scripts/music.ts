@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-//  Bolt Music  –  music.ts
+//  Cr1mson Music  –  music.ts
 //  Local music player (Tidal integration placeholder ready)
 // ═══════════════════════════════════════════════════════════════
 

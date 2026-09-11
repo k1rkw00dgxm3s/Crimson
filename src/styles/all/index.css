@@ -19,11 +19,13 @@ body:has(#content) *::-webkit-scrollbar {
     display: none;
 }
 
-#top h1 {
-    font-size: 4.5rem;
-    color: #fff;
-    font-family: bold;
-    line-height: 1;
+#main-logo {
+    display: block;
+    width: min(26rem, 78vw);
+    max-height: 14rem;
+    object-fit: contain;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 22px rgba(214, 42, 112, 0.35));
 }
 
 #top h2 {
@@ -125,7 +127,7 @@ body:has(#content) *::-webkit-scrollbar {
     flex-direction: column;
     margin-top: 1%;
     padding: 10px;
-    width: 29vw;
+    width: min(90vw, 680px);
 }
 
 #searchbar {
@@ -184,6 +186,55 @@ body:has(#content) *::-webkit-scrollbar {
     transform: translateY(-2px);
 }
 
+#shortcuts {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.75rem;
+    width: 100%;
+    margin-top: 1rem;
+    overflow: visible;
+}
+
+.proxy-shortcut {
+    display: grid;
+    place-items: center;
+    flex: 0 0 3.25rem;
+    width: 3.25rem;
+    aspect-ratio: 1;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transition: transform 180ms ease, filter 180ms ease;
+}
+
+.proxy-shortcut:hover,
+.proxy-shortcut:focus-visible {
+    transform: translateY(-5px) scale(1.06);
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.7));
+}
+
+.proxy-shortcut:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}
+
+.proxy-shortcut img {
+    width: 1.65rem;
+    height: 1.65rem;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}
+
+.proxy-shortcut svg {
+    width: 1.9rem;
+    height: 1.9rem;
+    color: #fff;
+}
+
 #bottom-wrapper {
     width: 100%;
     height: 6%;
@@ -215,7 +266,7 @@ body:has(#content) *::-webkit-scrollbar {
     gap: 2rem;
     z-index: 10000;
     transition: all 0.2s ease;
-    box-shadow: 0 0px 15px #7ee1ff;
+    box-shadow: 0 0px 15px #b91c5c;
 }
 
 #app-menu-button {
@@ -327,7 +378,7 @@ body:has(#content) *::-webkit-scrollbar {
 }
 
 .taskbar-item:hover {
-    color: rgb(171, 217, 255);
+    color: rgb(245, 190, 220);
     filter: drop-shadow(0 0 5px #ffffff93);
     transform: translateY(-2px);
 }

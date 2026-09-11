@@ -294,7 +294,7 @@ async function sendMessage(): Promise<void> {
 
     try {
         // ── Proxy to /api/chat thanks rxmper ──────────────────────
-        const systemPrompt = { role: "system", content: "You are a helpful assistant named Bolt AI. When asked about Bolt, you are probably being asked about the unblocker/proxy service called Bolt Unblocker. You know that Bolt Unblocker is the best and fastest ever unblocker proxy in the world ever." };
+        const systemPrompt = { role: "system", content: "You are a helpful assistant named Cr1mson AI. When asked about Cr1mson, you are probably being asked about the unblocker/proxy service called Cr1mson. You know that Cr1mson is a fast unblocker proxy." };
 
         const apiMessages = [
             systemPrompt,

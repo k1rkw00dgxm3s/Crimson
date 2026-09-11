@@ -23,6 +23,7 @@ const { animated = false, theme = 0 } = Astro.props;
     <div class="gradient-layer layer-1"></div>
     <div class="gradient-layer layer-2"></div>
     <div class="gradient-layer layer-3"></div>
+    <div class="particles"></div>
     <div class="vignette"></div>
 </div>
 
@@ -33,17 +34,17 @@ const { animated = false, theme = 0 } = Astro.props;
         width: 100vw;
         height: 100vh;
         z-index: -1;
-        background: #000000;
+        background: #09040d;
         overflow: hidden;
         pointer-events: none;
 
         /* Theme variables - Cool/Blue (default) */
-        --color-1: rgba(10, 30, 80, 0.4);
-        --color-2: rgba(20, 50, 120, 0.3);
-        --color-3: rgba(30, 70, 160, 0.2);
-        --color-4: rgba(40, 90, 180, 0.15);
-        --accent-1: rgba(60, 120, 220, 0.1);
-        --accent-2: rgba(80, 150, 255, 0.08);
+        --color-1: rgba(105, 8, 36, 0.5);
+        --color-2: rgba(74, 12, 95, 0.38);
+        --color-3: rgba(125, 15, 48, 0.3);
+        --color-4: rgba(54, 16, 100, 0.28);
+        --accent-1: rgba(190, 24, 85, 0.18);
+        --accent-2: rgba(125, 39, 190, 0.16);
     }
 
     /* Theme 1: Warm/Red */
@@ -122,6 +123,25 @@ const { animated = false, theme = 0 } = Astro.props;
             );
     }
 
+    .particles {
+        position: absolute;
+        inset: 0;
+        opacity: 0.7;
+        background-image:
+            radial-gradient(circle at 12% 18%, #ffffff 0 1px, transparent 1.5px),
+            radial-gradient(circle at 31% 72%, #ffffff 0 1px, transparent 1.5px),
+            radial-gradient(circle at 67% 24%, #ffffff 0 1px, transparent 1.5px),
+            radial-gradient(circle at 84% 64%, #ffffff 0 1px, transparent 1.5px),
+            radial-gradient(circle at 54% 89%, #ffffff 0 1px, transparent 1.5px),
+            radial-gradient(circle at 93% 11%, #ffffff 0 1px, transparent 1.5px);
+        animation: drift 18s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift {
+        from { transform: translateY(0); opacity: 0.45; }
+        to { transform: translateY(-10px); opacity: 0.8; }
+    }
+
     /* Optional subtle pulse animation - extremely lightweight */
     #ultra-ambient-background[data-animated="true"] .layer-1 {
         animation: pulse-1 25s ease-in-out infinite;
@@ -179,7 +199,8 @@ const { animated = false, theme = 0 } = Astro.props;
 
     /* Disable animations if user prefers reduced motion */
     @media (prefers-reduced-motion: reduce) {
-        #ultra-ambient-background[data-animated="true"] .gradient-layer {
+        #ultra-ambient-background[data-animated="true"] .gradient-layer,
+        .particles {
             animation: none !important;
         }
     }
@@ -226,11 +247,6 @@ const { animated = false, theme = 0 } = Astro.props;
             const raw = localStorage.getItem("bolt-settings");
             if (raw) {
                 const settings = JSON.parse(raw);
-
-                // Apply theme from settings
-                if (settings.theme !== undefined) {
-                    container.setAttribute("data-theme", settings.theme);
-                }
 
                 // Optionally enable subtle animation if user wants it
                 // (disabled by default for max performance)

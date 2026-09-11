@@ -77,7 +77,7 @@ if (typeof window !== 'undefined') {
                 align-items: center; justify-content: center; cursor: pointer;
                 color: white; font-family: sans-serif; font-size: 1.5rem;
             `;
-                overlay.textContent = 'Click anywhere to cloak Bolt';
+                overlay.textContent = 'Click anywhere to cloak Cr1mson';
                 document.body.appendChild(overlay);
 
                 overlay.addEventListener('click', () => {

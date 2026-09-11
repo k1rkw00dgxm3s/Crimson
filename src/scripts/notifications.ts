@@ -1,10 +1,10 @@
 /**
- * Bolt Notification System
+ * Cr1mson Notification System
  * ========================
  * Usage:
  *   notify({
  *     title: "Update Available",
- *     desc: "Bolt needs an update!",
+ *     desc: "Cr1mson needs an update!",
  *     img: "/img/bolt.ico",          // optional
  *     lifespan: 6,                   // seconds (default: 5)
  *     important: true,               // highlights with accent color

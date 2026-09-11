@@ -181,6 +181,13 @@ import Layout from "../Layouts/Layout.astro";
                 <div id="games" class="games-grid"></div>
             </section>
         </div>
-        <script src="../scripts/games.ts"></script>
+        <script src="https://cdn.jsdelivr.net/gh/luminsdk/script@latest/lumin.min.js"></script>
+        <script>
+            window.addEventListener("load", () => {
+                if (window.Lumin) {
+                    window.Lumin.init({ container: "#games", theme: "light" });
+                }
+            });
+        </script>
     </main>
 </Layout>

@@ -26,7 +26,7 @@ export const POST: APIRoute = async ({ request }) => {
             "Authorization": `Bearer ${apiKey}`,
             "Content-Type": "application/json",
             "HTTP-Referer": request.headers.get("origin") ?? "",
-            "X-Title": "Bolt AI",
+            "X-Title": "Cr1mson AI",
         },
         body: JSON.stringify(body),
     });

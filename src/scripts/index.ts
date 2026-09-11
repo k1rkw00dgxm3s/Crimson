@@ -8,12 +8,11 @@ import { deepReset } from "./settings";
 const windowManager = WindowManager.getInstance();
 (window as any).Window = Window;
 (window as any).WindowManager = WindowManager;
-const mainTitle = document.querySelector("#main-title") as HTMLHeadingElement;
-const greeting = document.querySelector("#greeting") as HTMLHeadingElement;
 const settings = JSON.parse(localStorage.getItem("bolt-settings") || "{}");
 const searchBar = document.querySelector("#searchbar input") as HTMLInputElement;
 const searchForm = document.querySelector("#search-form") as HTMLFormElement;
 const searchButton = document.querySelector("#search-form button") as HTMLButtonElement;
+const shortcutLinks = document.querySelectorAll<HTMLAnchorElement>(".proxy-shortcut");
 const searchEngine = settings.searchEngine || 'duckduckgo';
 let searchEngineUrl = '';
 
@@ -53,9 +52,33 @@ function search(event?: Event) {
     }
 
     new Window({
-        url: "/browser?url=" + destinationUrl,
+        url: "/browser?url=" + encodeURIComponent(destinationUrl),
         title: "Browser",
         icon: "/img/icons/browser.webp",
+        startMaximized: false
+    });
+}
+
+function openShortcut(event: Event): void {
+    event.preventDefault();
+    const link = event.currentTarget as HTMLAnchorElement;
+    const destinationUrl = link.dataset.url;
+    if (!destinationUrl) return;
+
+    if (link.dataset.internal === "true") {
+        new Window({
+            url: destinationUrl,
+            title: link.dataset.title || "Cr1mson",
+            icon: link.querySelector("img")?.src || "/img/icons/browser.webp",
+            startMaximized: false
+        });
+        return;
+    }
+
+    new Window({
+        url: "/browser?url=" + encodeURIComponent(destinationUrl),
+        title: "Browser",
+        icon: link.querySelector("img")?.src || "/img/icons/browser.webp",
         startMaximized: false
     });
 }
@@ -63,20 +86,7 @@ function search(event?: Event) {
 
 searchForm.addEventListener("submit", search);
 searchButton.addEventListener("click", search);
-const phrases = ["Proverbs 4:7", "Killing School Boredom", "If you're caught, I was never here", "lock in bro", "(not) developed by a donut", "fastest proxy since 2067", "RAHH 🦅🦅🇺🇸🇺🇸"];
-if (settings.showGreeting === false) {
-    mainTitle.textContent = "Bolt";
-
-    const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-    greeting.textContent = randomPhrase;
-} else {
-    const words = ["Welcome", "Hello", "Hi There", "Aloha", "Hola"];
-
-    const randomWord = words[Math.floor(Math.random() * words.length)];
-    const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-    mainTitle.textContent = randomWord;
-    greeting.textContent = randomPhrase;
-}
+shortcutLinks.forEach((shortcut) => shortcut.addEventListener("click", openShortcut));
 // First visit debug window logic
 const firstVisitKey = "bolt-first-visit";
 const latestVersion = await fetch("/misc/updateKey.txt").then((res) => res.text());
@@ -91,7 +101,7 @@ if (typeof window !== 'undefined') {
     if (localStorage.getItem("current-version") !== latestVersion) {
         notify({
             title: "Update Available",
-            desc: "Bolt needs an update! Some features may be broken until updated. Open settings to update.",
+            desc: "Cr1mson needs an update! Some features may be broken until updated. Open settings to update.",
             img: "/img/warning.webp",
             lifespan: 6,
             important: false,

@@ -1,5 +1,5 @@
 <div align="center">
-      <h1><b>Get ready for Bolt</b></h1>
+      <h1><b>Get ready for Cr1mson</b></h1>
 <img src="https://i.imgur.com/Yl2BdtT.png" style="width: 1200px">
 <img src="https://i.postimg.cc/8c8z0BmC/boltosdemo.png" style="width: 1200px">
 </div>
@@ -22,11 +22,11 @@
   </b>
 </h1>
 <p>
-  Bolt uses <a href="https://github.com/titaniumnetwork-dev/Ultraviolet">Ultraviolet</a>, a proxy backend provided from Titanium Network. Ultraviolet v3 is a fast proxy service, but it's successor, <a href="https://github.com/MercuryWorkshop/scramjet">Scramjet</a>, is in the works. Bolt also uses Scramjet, but will default to Ultraviolet because Scramjet is not ready for production yet.
+  Cr1mson uses <a href="https://github.com/titaniumnetwork-dev/Ultraviolet">Ultraviolet</a>, a proxy backend provided from Titanium Network. Ultraviolet v3 is a fast proxy service, but it's successor, <a href="https://github.com/MercuryWorkshop/scramjet">Scramjet</a>, is in the works. Cr1mson also uses Scramjet, but will default to Ultraviolet because Scramjet is not ready for production yet.
 </p>
 <h1>
   <b>
-    Why Bolt is Better than other Proxies
+    Why Cr1mson is Better than other Proxies
   </b>
 </h1>
 <p>
@@ -52,7 +52,7 @@
   </b>
 </h1>
 <p>
-  To use Bolt, you must deploy it. You <b><i>CANNOT</i></b> deploy to services such as:
+  To use Cr1mson, you must deploy it. You <b><i>CANNOT</i></b> deploy to services such as:
   
   - <b>Vercel</b><br>
   - <b>Netlify</b><br>
@@ -89,5 +89,5 @@
   pnpm start
   ```pnpm start
   
-  You should have Bolt running locally on <b>localhost:8080</b>!
+  You should have Cr1mson running locally on <b>localhost:8080</b>!
 </p>

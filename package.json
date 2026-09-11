@@ -24,19 +24,19 @@
     "three": "^0.182.0",
     "typescript": "^5.9.3"
   },
-  "description": "git clone <repository-url>\r    cd Bolt-Dev\r    ```",
+  "description": "Cr1mson proxy service",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Bolt-Network/Bolt-Dev.git"
+    "url": "git+https://github.com/Cr1mson/Cr1mson.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Bolt-Network/Bolt-Dev/issues"
+    "url": "https://github.com/Cr1mson/Cr1mson/issues"
   },
-  "homepage": "https://github.com/Bolt-Network/Bolt-Dev#readme",
+  "homepage": "https://github.com/Cr1mson/Cr1mson#readme",
   "devDependencies": {
     "@types/three": "^0.182.0"
   }
