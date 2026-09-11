@@ -1,4 +1,4 @@
-# Cr1mson
+# What i look like: https://cdn.corenexis.com/view/81731171440
 
 Cr1mson is a self-hosted proxy homepage with Scramjet/Ultraviolet browsing, a crimson-themed interface, realtime `#general` chat, and the Lumin Games page.
 
